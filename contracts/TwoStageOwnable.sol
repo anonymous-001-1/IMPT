@@ -48,7 +48,6 @@ abstract contract TwoStageOwnable {
         _nominatedOwner = owner_;
         emit OwnerNominated(owner_);
     }
-
     function _setOwner(address newOwner) internal {
         if (_owner == newOwner) return;
         _owner = newOwner;

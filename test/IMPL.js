@@ -57,7 +57,6 @@ describe('IMPL', async () => {
             const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
             let transfer_amount=10
               await contract.connect(account1).transfer(account6.address,transfer_amount)
-             //console.log(await contract.balanceOf(account6.address))
               let amtineth=(await contract.balanceOf(account6.address))
               expect(amtineth).to.be.equal(transfer_amount);
           })
@@ -90,12 +89,71 @@ describe('IMPL', async () => {
             const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
             let allowance_amt=50
             await expect(contract.connect(account1).approve(account6.address,allowance_amt)).to.emit(contract, "Approval")
- })
-})
+        })
+      })
+          describe("check for pausable", () => {
+            it("The transfer fails when paused", async () => {
+              
+              const {contract,recipients,amount} =await loadFixture(deployFixture)
+              const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
+              let transfer_amount=10
+               await contract.connect(owner).pause();
+               await expect (contract.connect(account1).transfer(account6.address,transfer_amount)).to.be.reverted;  
+            })
+            it("The transaction continues when not paused", async () => {
+              const {contract,recipients,amount} =await loadFixture(deployFixture)
+              const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
+              let transfer_amount=10
+              await contract.connect(owner).pause();
+              await expect (contract.connect(account1).transfer(account6.address,transfer_amount)).to.be.reverted
+              await contract.connect(owner).unpause();
+              await contract.connect(account1).transfer(account6.address,transfer_amount)
+              let amtineth=(await contract.balanceOf(account6.address))
+              expect(amtineth).to.be.equal(transfer_amount);
+
+            })
+          })
 })
 
-describe("Two stage owndalbe",()=>{
-    
-})
+
+        describe("Two stage ownable",()=>{
+            async function deployFixture(){
+                const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
+                const Contract= await ethers.getContractFactory("IMPT",owner);
+                let recipients=[account1.address,account2.address,account3.address,account4.address,account5.address];
+                let amount=[100,200,300,400,1000]
+                const contract=await Contract.deploy(params.name,params.Symbol,owner.address,recipients,amount);
+                await contract.deployed();
+                return {owner,contract,recipients,amount,account6};
+             }
+             it("Should set the right owner",async ()=>{
+                const {contract,recipients,amount} =await loadFixture(deployFixture)
+                const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
+                expect(await contract.owner()).to.be.equal(owner.address);
+             })
+             
+             describe("nominate new owner", ()=>{
+                    it("Only owner can nominate new owner", async()=>{
+                        const {contract,recipients,amount} =await loadFixture(deployFixture)
+                        const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
+                        await expect( contract.connect(account1).nominateNewOwner(account6.address)).to.be.revertedWith("Not owner")
+                    })
+                    it("should allow owner to nominate new owners", async()=>{
+                        const {contract,recipients,amount} =await loadFixture(deployFixture)
+                        const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
+                        await expect( contract.connect(account1).nominateNewOwner(account6.address)).to.be.revertedWith("Not owner")
+                    })
+                    it("should change ownerto new owner once accpeted", async()=>{
+                      const {contract,recipients,amount} =await loadFixture(deployFixture)
+                      const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
+                      await expect( contract.connect(owner).nominateNewOwner(account6.address))
+                      await contract.connect(account6).acceptOwnership()
+                      expect(await contract.owner()).to.be.equal(account6.address);
+
+                    })
+                
+             })
+ 
+        })
 
 
