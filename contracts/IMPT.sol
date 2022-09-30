@@ -43,7 +43,6 @@ contract IMPT is ERC20Burnable, TwoStageOwnable, Pausable, ERC20Permit {
         _pause();
         return true;
     }
-
     /**
      * @notice unpause the contract
      * @return boolean value indicating whether the operation succeeded
