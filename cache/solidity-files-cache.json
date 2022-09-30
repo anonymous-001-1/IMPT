@@ -45,8 +45,8 @@
       ]
     },
     "/home/hoysal/TA/impt-token/contracts/TwoStageOwnable.sol": {
-      "lastModificationDate": 1664523631311,
-      "contentHash": "bec46b0a50eddef9296cf9d31b049468",
+      "lastModificationDate": 1664539684283,
+      "contentHash": "0a262c4b20fca6517c276ea726199907",
       "sourceName": "contracts/TwoStageOwnable.sol",
       "solcConfig": {
         "version": "0.8.12",

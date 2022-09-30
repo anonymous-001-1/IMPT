@@ -17,7 +17,7 @@ abstract contract TwoStageOwnable {
     event OwnerNominated(address indexed nominatedOwner);
 
     constructor(address owner_) {
-        require(owner_ != address(0), "Owner is zero");
+        require(owner_ != address(0),"Owner is zero");
         _setOwner(owner_);
     }
 

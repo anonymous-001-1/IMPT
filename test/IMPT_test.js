@@ -19,15 +19,38 @@ describe('IMPL', async () => {
         return {owner,contract,recipients,amount,account6};
      }
  
-     describe("constructor check", async (done) =>{
- 
+     describe("constructor check", async () =>{
+          
+         it("should fail if unequal number of recipients and amount", async ()=>{
+          const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
+          const Contract= await ethers.getContractFactory("IMPT",owner);
+          let recipients=[account1.address,account2.address,account3.address,account4.address,account5.address];
+          let amount=[100,200,300,400]
+          await expect( Contract.deploy(params.name,params.Symbol,owner.address,recipients,amount)).to.be.revertedWith("Invalid params length"); 
+
+        })
+        it("Should fail if more than 20 aurguments are passed",async()=>{
+          const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10,account11,account12,account13,account14,account15,account16,account17,account18,account19] = await ethers.getSigners();
+          
+          const Contract= await ethers.getContractFactory("IMPT",owner);
+          let recipients=[account1.address,account2.address,account3.address,account4.address,account5.address,account6.address,account7.address,account8.address,account9.address,account10.address,account11.address,account12.address,account13.address,account14.address,account15.address,account16.address,account17.address,account18.address,account19.address,account1.address,account2.address];
+          let amount=[100,200,300,400,500,600,700,200,900,1000,100,200,300,400,500,600,700,800,900,1000,100]
+          await expect( Contract.deploy(params.name,params.Symbol,owner.address,recipients,amount)).to.be.revertedWith("Invalid recipients length");         
+         })
+         it("Should fail if any negative amount passed",async ()=>{
+          const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10,account11,account12,account13,account14,account15,account16,account17,account18,account19] = await ethers.getSigners();
+          const Contract= await ethers.getContractFactory("IMPT",owner);
+          let recipients=[account1.address,account2.address,account3.address,account4.address,account5.address];
+          let amount=[100,200,300,-400,500]   
+          await expect( Contract.deploy(params.name,params.Symbol,owner.address,recipients,amount)).to.be.rejected;         
+         })
         it("Check for valid name and symbol", async ()=>{
  
             const {owner,contract,recipients,amount} =await loadFixture(deployFixture)
                expect(await contract.name()).to.be.equal(params.name);
                expect(await contract.symbol()).to.be.equal(params.Symbol);
         })
-
+  
         it("The owner is set right", async ()=>{
             const {owner,contract,recipients,amount} =await loadFixture(deployFixture)
             expect(await contract.owner()).to.be.equal(owner.address);
@@ -126,11 +149,24 @@ describe('IMPL', async () => {
                 await contract.deployed();
                 return {owner,contract,recipients,amount,account6};
              }
+             it("Should not accept zero address as owner",async ()=>{
+              const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
+              const Contract= await ethers.getContractFactory("IMPT",owner);
+              let recipients=[account1.address,account2.address,account3.address,account4.address,account5.address];
+              let amount=[100,200,300,400,1000]
+              let zeroaddr=ethers.constants.AddressZero
+             await expect (Contract.deploy(params.name,params.Symbol,zeroaddr,recipients,amount)).to.be.revertedWith("Owner is zero");
+             })
              it("Should set the right owner",async ()=>{
                 const {contract,recipients,amount} =await loadFixture(deployFixture)
                 const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
                 expect(await contract.owner()).to.be.equal(owner.address);
              })
+             it("Shouldn't fail if new owner is same owner",async ()=>{
+              const {contract,recipients,amount} =await loadFixture(deployFixture)
+              const  [owner,account1,account2,account3,account4,account5,account6,account7,account8,account9,account10] = await ethers.getSigners();
+              
+           })
              
              describe("nominate new owner", ()=>{
                     it("Only owner can nominate new owner", async()=>{
