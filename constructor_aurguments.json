@@ -1,0 +1,9 @@
+
+{
+
+"ERC20_name":"IMPT_TEST",
+"ERC20_symbol":"IMPT",
+"owner_address":"0x0000000000000000000000000000000000000001",
+"recipients_address_array":["0x0000000000000000000000000000000000000001"],
+"recipients_amounts":[1]
+}
